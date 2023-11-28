@@ -4,53 +4,42 @@ import org.springframework.stereotype.Service;
 import pro.sky.java.course2.lesson6.springemployeebook.Employee;
 import pro.sky.java.course2.lesson6.springemployeebook.exceptions.EmployeeAlreadyAddedException;
 import pro.sky.java.course2.lesson6.springemployeebook.exceptions.EmployeeNotFoundException;
-import pro.sky.java.course2.lesson6.springemployeebook.exceptions.EmployeeStorageIsFullException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-    private final List<Employee> employees;
+    private final Map<String, Employee> employees;
 
     public EmployeeServiceImpl() {
-        this.employees = new ArrayList<>();
-    }
-
-    int maxNumberOfEmployees = 10;
-
-    public List<Employee> showInfo() {
-        return new ArrayList<>(employees);
+        this.employees = new HashMap<>();
     }
 
     @Override
     public Employee add(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-        if (employees.contains(employee)) {
+        if (employees.containsKey(employee.getFirstName() + employee.getLastName())) {
             throw new EmployeeAlreadyAddedException("Employee has already added");
         }
-        if (employees.size() >= maxNumberOfEmployees) {
-            throw new EmployeeStorageIsFullException("The company isn't looking for new employees");
-        }
-        employees.add(employee);
+        employees.put(employee.getFirstName() + employee.getLastName(), employee);
         return employee;
     }
 
     @Override
     public Employee remove(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-        if (employees.contains(employee)) {
-            employees.remove(employee);
-            return employee;
-        } else {
+        if (!employees.containsKey(employee.getFirstName() + employee.getLastName())) {
             throw new EmployeeNotFoundException("Employee doesn't exist");
         }
+        employees.remove(employee.getFirstName() + employee.getLastName());
+        return employee;
     }
 
     @Override
     public Employee find(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-        if (!(employees.contains(employee))) {
+        if (!employees.containsKey(employee.getFirstName() + employee.getLastName())) {
             throw new EmployeeNotFoundException("Employee doesn't exist");
         }
         return employee;

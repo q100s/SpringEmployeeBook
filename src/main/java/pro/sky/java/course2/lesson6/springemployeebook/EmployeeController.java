@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pro.sky.java.course2.lesson6.springemployeebook.services.EmployeeService;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
@@ -14,11 +12,6 @@ public class EmployeeController {
 
     public EmployeeController(EmployeeService employeeService) {
         this.service = employeeService;
-    }
-
-    @GetMapping
-    public List<Employee> showInfo() {
-        return service.showInfo();
     }
 
     @GetMapping("/add")
