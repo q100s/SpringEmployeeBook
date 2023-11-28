@@ -11,26 +11,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class DepartmentService implements IDepartmentService {
-    private final EmployeeService employeeService;
+    private final IEmployeeService employeeService;
 
     public DepartmentService(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
     @Override
-    public Employee getEmployeeWithMaxSalary(int department) {
+    public Map<Integer, List<Employee>> separateAllByDepartment() {
         return employeeService.getAll().stream()
-                .filter(employee -> employee.getDepartment() == department)
-                .max(Comparator.comparingDouble(Employee::getSalary))
-                .orElseThrow(EmployeeNotFoundException::new);
-    }
-
-    @Override
-    public Employee getEmployeeWithMinSalary(int department) {
-        return employeeService.getAll().stream()
-                .filter(employee -> employee.getDepartment() == department)
-                .min(Comparator.comparingDouble(Employee::getSalary))
-                .orElseThrow(EmployeeNotFoundException::new);
+                .collect(Collectors.groupingBy(Employee::getDepartment));
     }
 
     @Override
@@ -41,8 +31,27 @@ public class DepartmentService implements IDepartmentService {
     }
 
     @Override
-    public Map<Integer, List<Employee>> separateAllByDepartment() {
+    public double getMaxSalary(int department) {
         return employeeService.getAll().stream()
-                .collect(Collectors.groupingBy(Employee::getDepartment));
+                .filter(employee -> employee.getDepartment() == department)
+                .max(Comparator.comparingDouble(Employee::getSalary))
+                .map(Employee::getSalary)
+                .orElseThrow(EmployeeNotFoundException::new);
+    }
+
+    @Override
+    public double getMinSalary(int department) {
+        return employeeService.getAll().stream()
+                .filter(employee -> employee.getDepartment() == department)
+                .min(Comparator.comparingDouble(Employee::getSalary))
+                .map(Employee::getSalary)
+                .orElseThrow(EmployeeNotFoundException::new);
+    }
+
+    public double getSumOfSalaries(int department) {
+        return employeeService.getAll().stream()
+                .filter(employee -> employee.getDepartment() == department)
+                .mapToDouble(Employee::getSalary)
+                .sum();
     }
 }

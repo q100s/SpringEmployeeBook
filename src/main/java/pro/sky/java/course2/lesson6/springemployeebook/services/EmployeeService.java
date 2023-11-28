@@ -13,7 +13,12 @@ import java.util.*;
 @Service
 public class EmployeeService implements IEmployeeService {
     private final Map<String, Employee> employees = new HashMap<>(MAX_SIZE);
-    private static final int MAX_SIZE = 3;
+    private static final int MAX_SIZE = 6;
+
+    @Override
+    public List<Employee> getAll() {
+        return Collections.unmodifiableList(new ArrayList<>(employees.values()));
+    }
 
     @Override
     public Employee add(String firstName, String lastName, double salary, int department) {
@@ -22,7 +27,7 @@ public class EmployeeService implements IEmployeeService {
             throw new FullStorageException("Storage is full");
         }
         Employee employeeToAdd = new Employee(firstName, lastName, salary, department);
-        if (employees.containsKey(createKey(firstName, lastName))) {
+        if (employees.containsKey(StringUtils.capitalize(createKey(firstName, lastName)))) {
             throw new EmployeeAlreadyAddedException("Employee has already added");
         }
         employees.put(StringUtils.capitalize(createKey(firstName, lastName)), employeeToAdd);
@@ -32,24 +37,19 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public Employee remove(String firstName, String lastName) {
         checkValidateInput(firstName, lastName);
-        if (!employees.containsKey(createKey(firstName, lastName))) {
+        if (!employees.containsKey(StringUtils.capitalize(createKey(firstName, lastName)))) {
             throw new EmployeeNotFoundException("Employee doesn't exist");
         }
-        return employees.remove(createKey(firstName, lastName));
+        return employees.remove(StringUtils.capitalize(createKey(firstName, lastName)));
     }
 
     @Override
     public Employee find(String firstName, String lastName) {
         checkValidateInput(firstName, lastName);
-        if (!employees.containsKey(createKey(firstName, lastName))) {
+        if (!employees.containsKey(StringUtils.capitalize(createKey(firstName, lastName)))) {
             throw new EmployeeNotFoundException("Employee doesn't exist");
         }
-        return employees.get(createKey(firstName, lastName));
-    }
-
-    @Override
-    public List<Employee> getAll() {
-        return Collections.unmodifiableList(new ArrayList<>(employees.values()));
+        return employees.get(StringUtils.capitalize(createKey(firstName, lastName)));
     }
 
     private String createKey(String firstName, String lastName) {
